@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ToolCommandName>backuphash</ToolCommandName>
+    <PackAsTool>true</PackAsTool>
+    <PackageOutputPath>.\nupkg</PackageOutputPath>
+    <PackageId>brendanlynn.backuphash</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Brendan Lynn</Authors>
+    <Description>
+      A CLI for users to back up their files without redundancy.
+    </Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/brendanlynn/backuphash/</RepositoryUrl>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <RootNamespace>BackupHash</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="LICENSE.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+</Project>
