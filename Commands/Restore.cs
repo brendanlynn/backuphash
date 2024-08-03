@@ -171,10 +171,10 @@ static partial class Commands {
         }
         UserInteraction.Info($"Operation succeeded with {pairs.Count} file(s) restored: {set_added.Count} added; {set_modified.Count} modified; and {set_deleted.Count} deleted.");
     }
-    public static Command Restore = new("restore", "Backs up the provided input file/directory (working directory if unspecified) to the provided output directory (working directory if unspecified).") {
+    public static Command Restore = new("restore", "Restores a backup in the backup directory to the output directory. Use --input to restore files to a different location than where they were when they were first backed up.") {
         new Option<string>(["--output", "-o"], "The output file/directory. Defaults to the working directory."),
         new Option<string>(["--backup-dir", "-b"], "The backup directory. Defaults to the working directory."),
-        new Option<string>(["--input", "-i"], "The directory in the backups. Defaults to the value of --output/-o. Intended to be used if the directory has moved since the backup took place."),
+        new Option<string>(["--input", "-i"], "The location of the files when they were first backed up; the directory in the backups. Defaults to the value of --output/-o."),
         new Option<long>(["--timestamp", "-ts"], "The timestamp of the backup used. Defaults to the most recent backup."),
     };
     private static void _Init_Restore() {
