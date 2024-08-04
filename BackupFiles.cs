@@ -23,7 +23,7 @@ static class BackupFiles {
     }
     public static string GetFileHash(string Path, HashAlgorithm HashAlgorithm) {
         byte[] bytes;
-        using (FileStream fs = new(Path, FileMode.Open))
+        using (FileStream fs = new(Path, FileMode.Open, FileAccess.Read, FileShare.Read))
             bytes = HashAlgorithm.ComputeHash(fs);
         return _BytesToString(bytes);
     }
