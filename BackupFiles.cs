@@ -34,7 +34,7 @@ static class BackupFiles {
     }
     public static (string Hash, bool IsNew) BackupFileNoUpdate(string Path, string BackupDir, HashAlgorithm HashAlgorithm, string Timestamp, bool RegardMeta) {
         string pathHash = GetStringHash(Path, HashAlgorithm);
-        string metaPath = System.IO.Path.Combine(BackupDir, "lo" + pathHash);
+        string metaPath = System.IO.Path.Combine(BackupDir, "lo_" + pathHash);
         FileInfo fi = new(Path);
         DateTime cCreation = fi.CreationTimeUtc;
         DateTime cModification = fi.LastWriteTimeUtc;
