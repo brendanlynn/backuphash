@@ -27,15 +27,45 @@ static class BackupFiles {
             bytes = HashAlgorithm.ComputeHash(fs);
         return _BytesToString(bytes);
     }
-    public static (string Hash, bool IsNew) BackupFileNoUpdate(string Path, string BackupDir, HashAlgorithm HashAlgorithm, string Timestamp) {
+    public static string GetStringHash(string String, HashAlgorithm HashAlgorithm) {
+        Encoding enc = Encoding.UTF8;
+        byte[] bytes = HashAlgorithm.ComputeHash(enc.GetBytes(String));
+        return _BytesToString(bytes);
+    }
+    public static (string Hash, bool IsNew) BackupFileNoUpdate(string Path, string BackupDir, HashAlgorithm HashAlgorithm, string Timestamp, bool RegardMeta) {
+        string pathHash = GetStringHash(Path, HashAlgorithm);
+        string metaPath = System.IO.Path.Combine(BackupDir, "lo" + pathHash);
+        FileInfo fi = new(Path);
+        DateTime cCreation = fi.CreationTime;
+        DateTime cModification = fi.LastWriteTime;
+        DateTime lastModified = cCreation > cModification ? cCreation : cModification;
+        if (RegardMeta) {
+            if (File.Exists(metaPath)) {
+                try {
+                    string metaData = File.ReadAllText(metaPath);
+                    string[] metas = metaData.Split(';');
+                    if (metas.Length == 2) {
+                        DateTime lastObtained = DateTime.Parse(metas[0]);
+                        string lastHash = metas[1];
+                        if (lastModified <= lastObtained)
+                            return (lastHash, false);
+                    }
+                }
+                catch { }
+            }
+        }
         string hash = GetFileHash(Path, HashAlgorithm);
-        FileInfo file = new(Path);
         string filePath = System.IO.Path.Combine(BackupDir, hash);
         bool isNew = !File.Exists(filePath);
-        if (isNew) _ = file.CopyTo(filePath, false);
+        if (isNew) _ = fi.CopyTo(filePath, false);
+        string metaText = lastModified.ToString() + ";" + hash;
+        try {
+            File.WriteAllText(metaPath, metaText);
+        }
+        catch { }
         return (hash, isNew);
     }
-    public static (int Added, int Preexisting) TakeSnapshot(List<string> Files, string BackupDir, DateTime Time, string Timestamp) {
+    public static (int Added, int Preexisting) TakeSnapshot(List<string> Files, string BackupDir, DateTime Time, string Timestamp, bool RegardMeta) {
         if (!Directory.Exists(BackupDir))
             _ = Directory.CreateDirectory(BackupDir);
         
@@ -48,7 +78,7 @@ static class BackupFiles {
         List<SnapshotFileMeta> backedHashes = [];
         using HashAlgorithm hashAlg = SHA1.Create();
         foreach (string file in Files) {
-            (string hash, bool isNew) = BackupFileNoUpdate(file, BackupDir, hashAlg, Timestamp);
+            (string hash, bool isNew) = BackupFileNoUpdate(file, BackupDir, hashAlg, Timestamp, RegardMeta);
             if (isNew)
                 ++added;
             else

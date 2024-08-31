@@ -4,7 +4,7 @@ using static System.Console;
 
 namespace BackupHash;
 static partial class Commands {
-    private static void _Backup(string? i, string? b, bool nc) {
+    private static void _Backup(string? i, string? b, bool nc, bool dlm) {
         i = Shared.MakePathFull(i);
         b = Shared.MakePathFull(b);
 
@@ -63,7 +63,7 @@ static partial class Commands {
         int added;
         int preexisting;
         try {
-            (added, preexisting) = BackupFiles.TakeSnapshot(files, b, time, timestamp);
+            (added, preexisting) = BackupFiles.TakeSnapshot(files, b, time, timestamp, !dlm);
         }
         catch (Exception e) {
             UserInteraction.Fatal(e.Message);
@@ -74,9 +74,10 @@ static partial class Commands {
     public static Command Backup = new("backup", "Backs up the provided input file/directory (working directory if unspecified) to the provided output directory (working directory if unspecified).") {
         new Option<string>(["--input", "-i"], "The input file/directory. Defaults to the working directory."),
         new Option<string>(["--backup-dir", "-b"], "The backup directory. Defaults to the working directory."),
-        new Option<bool>(["--no-confirm", "-nc"], "Whether or not the program confirms the backup before executing it.")
+        new Option<bool>(["--no-confirm", "-nc"], "Whether or not the program confirms the backup before executing it."),
+        new Option<bool>(["--disregard-last-modified", "-dlm"], "If unchosen, and the program comes across a file whose creation date and last write time are both not after the last time they were backed up, their hash will not be calculated and they will not be transferred. If chosen, the program will hash every file to determine whether they need to be copied, regardless of file metadata.")
     };
     private static void _Init_Backup() {
-        Backup.Handler = CommandHandler.Create<string?, string?, bool>(_Backup);
+        Backup.Handler = CommandHandler.Create<string?, string?, bool, bool>(_Backup);
     }
 }
