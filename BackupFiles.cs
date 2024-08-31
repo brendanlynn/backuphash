@@ -48,7 +48,7 @@ static class BackupFiles {
                     if (metas.Length == 2) {
                         long lastObtained = long.Parse(metas[0]);
                         string lastHash = metas[1];
-                        if (lastModifiedTicks <= lastObtained)
+                        if (lastModifiedTicks <= lastObtained && File.Exists(System.IO.Path.Combine(BackupDir, lastHash)))
                             return (lastHash, false);
                     }
                 }
