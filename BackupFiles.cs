@@ -36,18 +36,19 @@ static class BackupFiles {
         string pathHash = GetStringHash(Path, HashAlgorithm);
         string metaPath = System.IO.Path.Combine(BackupDir, "lo" + pathHash);
         FileInfo fi = new(Path);
-        DateTime cCreation = fi.CreationTime;
-        DateTime cModification = fi.LastWriteTime;
+        DateTime cCreation = fi.CreationTimeUtc;
+        DateTime cModification = fi.LastWriteTimeUtc;
         DateTime lastModified = cCreation > cModification ? cCreation : cModification;
+        long lastModifiedTicks = lastModified.Ticks;
         if (RegardMeta) {
             if (File.Exists(metaPath)) {
                 try {
                     string metaData = File.ReadAllText(metaPath);
                     string[] metas = metaData.Split(';');
                     if (metas.Length == 2) {
-                        DateTime lastObtained = DateTime.Parse(metas[0]);
+                        long lastObtained = long.Parse(metas[0]);
                         string lastHash = metas[1];
-                        if (lastModified <= lastObtained)
+                        if (lastModifiedTicks <= lastObtained)
                             return (lastHash, false);
                     }
                 }
@@ -58,7 +59,7 @@ static class BackupFiles {
         string filePath = System.IO.Path.Combine(BackupDir, hash);
         bool isNew = !File.Exists(filePath);
         if (isNew) _ = fi.CopyTo(filePath, false);
-        string metaText = lastModified.ToString() + ";" + hash;
+        string metaText = lastModifiedTicks.ToString() + ";" + hash;
         try {
             File.WriteAllText(metaPath, metaText);
         }
