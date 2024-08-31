@@ -8,7 +8,7 @@ static class BackupFiles {
         if (Data < 10)
             return (char)(Data + 0x30);
         else
-            return (char)(Data + 0x41);
+            return (char)(Data + 0x41 - 10);
     }
     private static string _BytesToString(byte[] Bytes) {
         StringBuilder sb = new(Bytes.Length << 1) {
@@ -16,8 +16,8 @@ static class BackupFiles {
         };
         for (int i = 0; i < Bytes.Length; i++) {
             int i2 = i << 1;
-            sb[i2] = _ByteToChar(Bytes[i] & 0x0F);
-            sb[i2 | 1] = _ByteToChar((Bytes[i] & 0xF0) >> 4);
+            sb[i2] = _ByteToChar((Bytes[i] & 0xF0) >> 4);
+            sb[i2 | 1] = _ByteToChar(Bytes[i] & 0x0F);
         }
         return sb.ToString();
     }
